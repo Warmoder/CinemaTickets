@@ -3,7 +3,7 @@
 #include <string.h>
 
 #define MAX_TICKETS 100
-#define MAX_MOVIES 5
+#define MAX_MOVIES 10
 
 typedef struct {
     char name[50];
@@ -21,7 +21,12 @@ Movie movies[MAX_MOVIES] = {
     {"Interstellar", 120, "20:00"},
     {"The Matrix", 90, "17:00"},
     {"The Dark Knight", 110, "19:00"},
-    {"Avatar", 130, "21:00"}
+    {"Avatar", 130, "21:00"},
+    {"Titanic", 85, "16:00"},
+    {"The Godfather", 95, "15:00"},
+    {"Pulp Fiction", 105, "18:30"},
+    {"Fight Club", 100, "22:00"},
+    {"Forrest Gump", 90, "17:30"}
 };
 
 Ticket cart[MAX_TICKETS];
@@ -79,6 +84,23 @@ void viewCart() {
     printf("Total: %d UAH\n", total);
 }
 
+void payCart() {
+    int total = 0;
+    for (int i = 0; i < cartSize; i++) {
+        total += cart[i].movie.price * cart[i].quantity;
+    }
+    printf("\nTotal amount to pay: %d UAH\n", total);
+    printf("Enter payment amount: ");
+    int payment;
+    scanf("%d", &payment);
+    if (payment >= total) {
+        printf("Payment successful! Change: %d UAH\n", payment - total);
+        cartSize = 0; // Clear the cart after successful payment
+    } else {
+        printf("Insufficient amount! Payment failed.\n");
+    }
+}
+
 void menu() {
     int choice;
     while (1) {
@@ -86,7 +108,8 @@ void menu() {
         printf("1. List Movies\n");
         printf("2. Buy Tickets\n");
         printf("3. View Cart\n");
-        printf("4. Exit\n");
+        printf("4. Pay Cart\n");
+        printf("5. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
         switch (choice) {
@@ -100,6 +123,9 @@ void menu() {
                 viewCart();
                 break;
             case 4:
+                payCart();
+                break;
+            case 5:
                 exit(0);
             default:
                 printf("Invalid choice!\n");

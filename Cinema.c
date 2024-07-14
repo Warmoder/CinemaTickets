@@ -1,9 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #define MAX_TICKETS 100
 #define MAX_MOVIES 10
+
+#define RESET   "\033[0m"
+#define RED     "\033[31m"
+#define GREEN   "\033[32m"
+#define YELLOW  "\033[33m"
+#define CYAN    "\033[36m"
 
 typedef struct {
     char name[50];
@@ -32,10 +39,25 @@ Movie movies[MAX_MOVIES] = {
 Ticket cart[MAX_TICKETS];
 int cartSize = 0;
 
+void clearInputBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) {}
+}
+
+int getIntInput() {
+    int num;
+    while (scanf("%d", &num) != 1) {
+        printf(RED "Invalid input. Please enter a valid number: " RESET);
+        clearInputBuffer();
+    }
+    clearInputBuffer();
+    return num;
+}
+
 void displayMovies() {
-    printf("\nAvailable Movies:\n");
+    printf(CYAN "\nAvailable Movies:\n" RESET);
     for (int i = 0; i < MAX_MOVIES; i++) {
-        printf("%d. %s - %d UAH, Time: %s\n", i + 1, movies[i].name, movies[i].price, movies[i].time);
+        printf(CYAN "%d. %s - %d UAH, Time: %s\n" RESET, i + 1, movies[i].name, movies[i].price, movies[i].time);
     }
 }
 
@@ -59,29 +81,29 @@ void buyTickets() {
     int choice, quantity;
     displayMovies();
     printf("\nEnter the movie number to buy tickets: ");
-    scanf("%d", &choice);
+    choice = getIntInput();
     if (choice < 1 || choice > MAX_MOVIES) {
-        printf("Invalid choice!\n");
+        printf(RED "Invalid choice!\n" RESET);
         return;
     }
     printf("Enter the number of tickets: ");
-    scanf("%d", &quantity);
+    quantity = getIntInput();
     if (quantity < 1) {
-        printf("Invalid quantity!\n");
+        printf(RED "Invalid quantity!\n" RESET);
         return;
     }
     addTicketToCart(movies[choice - 1], quantity);
-    printf("Tickets for %s added to cart.\n", movies[choice - 1].name);
+    printf(GREEN "Tickets for %s added to cart.\n" RESET, movies[choice - 1].name);
 }
 
 void viewCart() {
-    printf("\nYour Cart:\n");
+    printf(GREEN "\nYour Cart:\n" RESET);
     int total = 0;
     for (int i = 0; i < cartSize; i++) {
-        printf("%d. %s - %d UAH x %d\n", i + 1, cart[i].movie.name, cart[i].movie.price, cart[i].quantity);
+        printf(GREEN "%d. %s - %d UAH x %d\n" RESET, i + 1, cart[i].movie.name, cart[i].movie.price, cart[i].quantity);
         total += cart[i].movie.price * cart[i].quantity;
     }
-    printf("Total: %d UAH\n", total);
+    printf(GREEN "Total: %d UAH\n" RESET, total);
 }
 
 void payCart() {
@@ -89,29 +111,57 @@ void payCart() {
     for (int i = 0; i < cartSize; i++) {
         total += cart[i].movie.price * cart[i].quantity;
     }
-    printf("\nTotal amount to pay: %d UAH\n", total);
+    printf(YELLOW "\nTotal amount to pay: %d UAH\n" RESET, total);
     printf("Enter payment amount: ");
-    int payment;
-    scanf("%d", &payment);
+    int payment = getIntInput();
     if (payment >= total) {
-        printf("Payment successful! Change: %d UAH\n", payment - total);
+        printf(GREEN "Payment successful! Change: %d UAH\n" RESET, payment - total);
         cartSize = 0; // Clear the cart after successful payment
     } else {
-        printf("Insufficient amount! Payment failed.\n");
+        printf(RED "Insufficient amount! Payment failed.\n" RESET);
     }
+}
+
+void saveCart() {
+    FILE *file = fopen("cart.txt", "w");
+    if (file == NULL) {
+        printf(RED "Error opening file for saving cart.\n" RESET);
+        return;
+    }
+    for (int i = 0; i < cartSize; i++) {
+        fprintf(file, "%s %d %d\n", cart[i].movie.name, cart[i].movie.price, cart[i].quantity);
+    }
+    fclose(file);
+    printf(GREEN "Cart saved successfully.\n" RESET);
+}
+
+void loadCart() {
+    FILE *file = fopen("cart.txt", "r");
+    if (file == NULL) {
+        printf(RED "Error opening file for loading cart.\n" RESET);
+        return;
+    }
+    cartSize = 0;
+    while (fscanf(file, "%s %d %d", cart[cartSize].movie.name, &cart[cartSize].movie.price, &cart[cartSize].quantity) != EOF) {
+        cartSize++;
+    }
+    fclose(file);
+    printf(GREEN "Cart loaded successfully.\n" RESET);
 }
 
 void menu() {
     int choice;
     while (1) {
-        printf("\nCinema Ticket Service\n");
-        printf("1. List Movies\n");
-        printf("2. Buy Tickets\n");
-        printf("3. View Cart\n");
-        printf("4. Pay Cart\n");
-        printf("5. Exit\n");
+        printf(GREEN "\nCinema Ticket Service\n" RESET);
+        printf(YELLOW "1. List Movies\n" RESET);
+        printf(YELLOW "2. Buy Tickets\n" RESET);
+        printf(YELLOW "3. View Cart\n" RESET);
+        printf(YELLOW "4. Pay Cart\n" RESET);
+        printf(YELLOW "5. Save Cart\n" RESET);
+        printf(YELLOW "6. Load Cart\n" RESET);
+        printf(YELLOW "7. Exit\n" RESET);
         printf("Enter your choice: ");
-        scanf("%d", &choice);
+        choice = getIntInput();
         switch (choice) {
             case 1:
                 displayMovies();
@@ -126,9 +176,15 @@ void menu() {
                 payCart();
                 break;
             case 5:
+                saveCart();
+                break;
+            case 6:
+                loadCart();
+                break;
+            case 7:
                 exit(0);
             default:
-                printf("Invalid choice!\n");
+                printf(RED "Invalid choice!\n" RESET);
         }
     }
 }

@@ -24,20 +24,6 @@ The program includes the following movies:
 9. Fight Club - 100 UAH, Time: 22:00
 10. Forrest Gump - 90 UAH, Time: 17:30
 
-## Usage
-
-1. **Compile the program:**
-    ```sh
-    gcc -o cinema cinema.c
-    ```
-
-2. **Run the program:**
-    ```sh
-    ./cinema
-    ```
-
-3. **Follow the on-screen menu to list movies, buy tickets, view the cart, and simulate payment.**
-
 ## Code Overview
 
 The main components of the program include:

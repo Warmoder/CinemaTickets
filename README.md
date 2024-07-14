@@ -1,18 +1,28 @@
 # Cinema Ticket Purchase Service
 
-This is a simple C program that simulates a cinema ticket purchase service. The program provides a console-based menu to list available movies, buy tickets, view the cart, and simulate payment.
+## Опис
+Ця програма на мові С реалізує сервіс купівлі квитків в кінотеатрі. Вона дозволяє користувачам переглядати список доступних фільмів, купувати квитки, переглядати кошик та здійснювати оплату. Програма також підтримує збереження та завантаження вмісту кошика.
 
-## Features
+## Функціональність
+- **Список фільмів:** Переглядайте доступні фільми з їхніми цінами та часом показу.
+- **Купівля квитків:** Купуйте квитки на обрані фільми.
+- **Кошик:** Переглядайте вміст вашого кошика з деталями про куплені квитки.
+- **Оплата:** Здійснюйте оплату за квитки в кошику.
+- **Збереження кошика:** Зберігайте вміст кошика у файл для подальшого використання.
+- **Завантаження кошика:** Завантажуйте вміст кошика з файлу.
 
-- **List Movies:** Display a list of available movies with their names, prices, and show times.
-- **Buy Tickets:** Select a movie and specify the number of tickets to add to the cart.
-- **View Cart:** View the current cart with details of the selected movies and total cost.
-- **Pay Cart:** Simulate the payment process by entering the total amount. The program checks if the payment is sufficient and clears the cart after successful payment.
+### Інструкції
+При запуску програми ви побачите меню з наступними опціями:
+1. **List Movies:** Перегляд списку доступних фільмів.
+2. **Buy Tickets:** Купівля квитків на обрані фільми.
+3. **View Cart:** Перегляд вмісту кошика.
+4. **Pay Cart:** Здійснення оплати за квитки в кошику.
+5. **Save Cart:** Збереження вмісту кошика у файл.
+6. **Load Cart:** Завантаження вмісту кошика з файлу.
+7. **Exit:** Вихід з програми.
 
-## Available Movies
-
-The program includes the following movies:
-
+### Список Фільмів
+У програмі доступні наступні фільми:
 1. Inception - 100 UAH, Time: 18:00
 2. Interstellar - 120 UAH, Time: 20:00
 3. The Matrix - 90 UAH, Time: 17:00
@@ -24,33 +34,37 @@ The program includes the following movies:
 9. Fight Club - 100 UAH, Time: 22:00
 10. Forrest Gump - 90 UAH, Time: 17:30
 
-## Code Overview
+## Приклад Використання
+1. **Перегляд Фільмів:**
+    ```
+    1. List Movies
+    ```
+2. **Купівля Квитків:**
+    ```
+    2. Buy Tickets
+    ```
+    Введіть номер фільму та кількість квитків.
+3. **Перегляд Кошика:**
+    ```
+    3. View Cart
+    ```
+4. **Оплата:**
+    ```
+    4. Pay Cart
+    ```
+    Введіть суму для оплати.
+5. **Збереження Кошика:**
+    ```
+    5. Save Cart
+    ```
+6. **Завантаження Кошика:**
+    ```
+    6. Load Cart
+    ```
 
-The main components of the program include:
-
-- **Movie Structure:** Defines the movie properties such as name, price, and show time.
-- **Ticket Structure:** Defines the ticket properties including the movie and the quantity of tickets.
-- **Movie Array:** Contains a list of available movies.
-- **Cart Array:** Stores the selected tickets.
-- **Functions:**
-  - `displayMovies()`: Displays the list of available movies.
-  - `addTicketToCart()`: Adds tickets to the cart.
-  - `buyTickets()`: Allows the user to buy tickets.
-  - `viewCart()`: Displays the current cart.
-  - `payCart()`: Simulates the payment process.
-  - `menu()`: Displays the main menu and handles user input.
-
-## Future Improvements
-
-- Add validation for user input.
-- Implement more detailed movie information.
-- Include discounts or special offers.
-- Enhance the user interface with colors and formatting.
-
-## License
-
-This project is open-source and available under the [MIT License](LICENSE).
-
----
-
-Feel free to modify the code and enhance the features as per your requirements. Contributions are welcome!
+## Кольоровий Інтерфейс
+Програма використовує кольори для покращення візуального сприйняття:
+- **Зелений:** Заголовки та успішні операції.
+- **Жовтий:** Опції меню.
+- **Червоний:** Помилки та попередження.
+- **Блакитний:** Список фільмів та інформація.

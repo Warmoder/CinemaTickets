@@ -5,6 +5,8 @@
 
 #define MAX_TICKETS 100
 #define MAX_MOVIES 10
+#define ROWS 5
+#define SEATS_PER_ROW 10
 
 #define RESET   "\033[0m"
 #define RED     "\033[31m"
@@ -16,28 +18,42 @@ typedef struct {
     char name[50];
     int price;
     char time[20];
+    char description[200];
+    int duration; // in minutes
 } Movie;
 
 typedef struct {
     Movie movie;
     int quantity;
+    char seats[ROWS][SEATS_PER_ROW];
 } Ticket;
 
+typedef struct {
+    char code[10];
+    int discount; // in percentage
+} Discount;
+
 Movie movies[MAX_MOVIES] = {
-    {"Inception", 100, "18:00"},
-    {"Interstellar", 120, "20:00"},
-    {"The Matrix", 90, "17:00"},
-    {"The Dark Knight", 110, "19:00"},
-    {"Avatar", 130, "21:00"},
-    {"Titanic", 85, "16:00"},
-    {"The Godfather", 95, "15:00"},
-    {"Pulp Fiction", 105, "18:30"},
-    {"Fight Club", 100, "22:00"},
-    {"Forrest Gump", 90, "17:30"}
+    {"Inception", 100, "18:00", "A mind-bending thriller by Christopher Nolan.", 148},
+    {"Interstellar", 120, "20:00", "A journey to save mankind through space and time.", 169},
+    {"The Matrix", 90, "17:00", "A computer hacker learns about the true nature of reality.", 136},
+    {"The Dark Knight", 110, "19:00", "Batman faces the Joker in a fight for Gotham's soul.", 152},
+    {"Avatar", 130, "21:00", "A paraplegic Marine dispatched to the moon Pandora.", 162},
+    {"Titanic", 85, "16:00", "A love story unfolds on the ill-fated Titanic.", 195},
+    {"The Godfather", 95, "15:00", "The aging patriarch of an organized crime dynasty.", 175},
+    {"Pulp Fiction", 105, "18:30", "The lives of two mob hitmen, a boxer, and a pair of robbers.", 154},
+    {"Fight Club", 100, "22:00", "An insomniac office worker forms an underground fight club.", 139},
+    {"Forrest Gump", 90, "17:30", "The life and times of a man with a low IQ.", 142}
 };
 
 Ticket cart[MAX_TICKETS];
 int cartSize = 0;
+
+Discount discounts[] = {
+    {"SAVE10", 10},
+    {"SAVE20", 20},
+    {"SAVE30", 30}
+};
 
 void clearInputBuffer() {
     int c;
@@ -58,6 +74,41 @@ void displayMovies() {
     printf(CYAN "\nAvailable Movies:\n" RESET);
     for (int i = 0; i < MAX_MOVIES; i++) {
         printf(CYAN "%d. %s - %d UAH, Time: %s\n" RESET, i + 1, movies[i].name, movies[i].price, movies[i].time);
+        printf(CYAN "   Description: %s\n" RESET, movies[i].description);
+        printf(CYAN "   Duration: %d minutes\n" RESET, movies[i].duration);
+    }
+}
+
+void displaySeats(char seats[ROWS][SEATS_PER_ROW]) {
+    printf(YELLOW "\nSeat arrangement (0 - available, X - booked):\n" RESET);
+    printf("   ");
+    for (int i = 0; i < SEATS_PER_ROW; i++) {
+        printf("%d ", i + 1);
+    }
+    printf("\n");
+    for (int i = 0; i < ROWS; i++) {
+        printf("%c: ", 'A' + i);
+        for (int j = 0; j < SEATS_PER_ROW; j++) {
+            printf("%c ", seats[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void chooseSeats(char seats[ROWS][SEATS_PER_ROW], int quantity) {
+    char row;
+    int seat;
+    for (int i = 0; i < quantity; i++) {
+        printf("Enter seat (e.g., A1): ");
+        scanf(" %c%d", &row, &seat);
+        row = toupper(row) - 'A';
+        seat -= 1;
+        if (row < 0 || row >= ROWS || seat < 0 || seat >= SEATS_PER_ROW || seats[row][seat] == 'X') {
+            printf(RED "Invalid seat or seat already booked. Try again.\n" RESET);
+            i--;
+        } else {
+            seats[row][seat] = 'X';
+        }
     }
 }
 
@@ -73,8 +124,10 @@ void addTicketToCart(Movie movie, int quantity) {
     if (!found) {
         cart[cartSize].movie = movie;
         cart[cartSize].quantity = quantity;
+        memset(cart[cartSize].seats, '0', sizeof(cart[cartSize].seats));
         cartSize++;
     }
+    chooseSeats(cart[cartSize - 1].seats, quantity);
 }
 
 void buyTickets() {
@@ -101,9 +154,24 @@ void viewCart() {
     int total = 0;
     for (int i = 0; i < cartSize; i++) {
         printf(GREEN "%d. %s - %d UAH x %d\n" RESET, i + 1, cart[i].movie.name, cart[i].movie.price, cart[i].quantity);
+        displaySeats(cart[i].seats);
         total += cart[i].movie.price * cart[i].quantity;
     }
     printf(GREEN "Total: %d UAH\n" RESET, total);
+}
+
+void applyDiscount(int *total) {
+    char code[10];
+    printf("Enter discount code: ");
+    scanf("%s", code);
+    for (int i = 0; i < sizeof(discounts) / sizeof(Discount); i++) {
+        if (strcmp(discounts[i].code, code) == 0) {
+            *total = *total * (100 - discounts[i].discount) / 100;
+            printf(GREEN "Discount applied! New total: %d UAH\n" RESET, *total);
+            return;
+        }
+    }
+    printf(RED "Invalid discount code.\n" RESET);
 }
 
 void payCart() {
@@ -111,6 +179,7 @@ void payCart() {
     for (int i = 0; i < cartSize; i++) {
         total += cart[i].movie.price * cart[i].quantity;
     }
+    applyDiscount(&total);
     printf(YELLOW "\nTotal amount to pay: %d UAH\n" RESET, total);
     printf("Enter payment amount: ");
     int payment = getIntInput();
@@ -130,9 +199,15 @@ void saveCart() {
     }
     for (int i = 0; i < cartSize; i++) {
         fprintf(file, "%s %d %d\n", cart[i].movie.name, cart[i].movie.price, cart[i].quantity);
+        for (int j = 0; j < ROWS; j++) {
+            for (int k = 0; k < SEATS_PER_ROW; k++) {
+                fprintf(file, "%c", cart[i].seats[j][k]);
+            }
+            fprintf(file, "\n");
+        }
     }
     fclose(file);
-    printf(GREEN "Cart saved successfully.\n" RESET);
+    printf(GREEN "Cart saved to cart.txt\n" RESET);
 }
 
 void loadCart() {
@@ -143,24 +218,29 @@ void loadCart() {
     }
     cartSize = 0;
     while (fscanf(file, "%s %d %d", cart[cartSize].movie.name, &cart[cartSize].movie.price, &cart[cartSize].quantity) != EOF) {
+        for (int j = 0; j < ROWS; j++) {
+            for (int k = 0; k < SEATS_PER_ROW; k++) {
+                fscanf(file, " %c", &cart[cartSize].seats[j][k]);
+            }
+        }
         cartSize++;
     }
     fclose(file);
-    printf(GREEN "Cart loaded successfully.\n" RESET);
+    printf(GREEN "Cart loaded from cart.txt\n" RESET);
 }
 
 void menu() {
     int choice;
-    while (1) {
-        printf(GREEN "\nCinema Ticket Service\n" RESET);
-        printf(YELLOW "1. List Movies\n" RESET);
-        printf(YELLOW "2. Buy Tickets\n" RESET);
-        printf(YELLOW "3. View Cart\n" RESET);
-        printf(YELLOW "4. Pay Cart\n" RESET);
-        printf(YELLOW "5. Save Cart\n" RESET);
-        printf(YELLOW "6. Load Cart\n" RESET);
-        printf(YELLOW "7. Exit\n" RESET);
-        printf("Enter your choice: ");
+    loadCart();
+    do {
+        printf(CYAN "\nCinema Ticket Purchase Service\n" RESET);
+        printf("1. List of Movies\n");
+        printf("2. Buy Tickets\n");
+        printf("3. View Cart\n");
+        printf("4. Pay Cart\n");
+        printf("5. Save Cart\n");
+        printf("6. Exit\n");
+        printf("\nEnter your choice: ");
         choice = getIntInput();
         switch (choice) {
             case 1:
@@ -179,14 +259,12 @@ void menu() {
                 saveCart();
                 break;
             case 6:
-                loadCart();
+                printf(CYAN "Exiting...\n" RESET);
                 break;
-            case 7:
-                exit(0);
             default:
-                printf(RED "Invalid choice!\n" RESET);
+                printf(RED "Invalid choice! Please try again.\n" RESET);
         }
-    }
+    } while (choice != 6);
 }
 
 int main() {

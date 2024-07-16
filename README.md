@@ -1,70 +1,62 @@
 # Cinema Ticket Purchase Service
 
-## Опис
-Ця програма на мові С реалізує сервіс купівлі квитків в кінотеатрі. Вона дозволяє користувачам переглядати список доступних фільмів, купувати квитки, переглядати кошик та здійснювати оплату. Програма також підтримує збереження та завантаження вмісту кошика.
+This program is a console-based ticket purchase service for a cinema. It allows users to view available movies, buy tickets, choose seats, view their cart, and pay for their tickets. The program also supports discount codes and saves the cart to a file.
 
-## Функціональність
-- **Список фільмів:** Переглядайте доступні фільми з їхніми цінами та часом показу.
-- **Купівля квитків:** Купуйте квитки на обрані фільми.
-- **Кошик:** Переглядайте вміст вашого кошика з деталями про куплені квитки.
-- **Оплата:** Здійснюйте оплату за квитки в кошику.
-- **Збереження кошика:** Зберігайте вміст кошика у файл для подальшого використання.
-- **Завантаження кошика:** Завантажуйте вміст кошика з файлу.
+## Features
 
-### Інструкції
-При запуску програми ви побачите меню з наступними опціями:
-1. **List Movies:** Перегляд списку доступних фільмів.
-2. **Buy Tickets:** Купівля квитків на обрані фільми.
-3. **View Cart:** Перегляд вмісту кошика.
-4. **Pay Cart:** Здійснення оплати за квитки в кошику.
-5. **Save Cart:** Збереження вмісту кошика у файл.
-6. **Load Cart:** Завантаження вмісту кошика з файлу.
-7. **Exit:** Вихід з програми.
+1. **List of Movies:**
+   - Displays available movies with their name, price, showtime, description, and duration.
 
-### Список Фільмів
-У програмі доступні наступні фільми:
-1. Inception - 100 UAH, Time: 18:00
-2. Interstellar - 120 UAH, Time: 20:00
-3. The Matrix - 90 UAH, Time: 17:00
-4. The Dark Knight - 110 UAH, Time: 19:00
-5. Avatar - 130 UAH, Time: 21:00
-6. Titanic - 85 UAH, Time: 16:00
-7. The Godfather - 95 UAH, Time: 15:00
-8. Pulp Fiction - 105 UAH, Time: 18:30
-9. Fight Club - 100 UAH, Time: 22:00
-10. Forrest Gump - 90 UAH, Time: 17:30
+2. **Buy Tickets:**
+   - Allows users to buy tickets for a selected movie.
+   - Users can choose specific seats in the cinema hall.
 
-## Приклад Використання
-1. **Перегляд Фільмів:**
-    ```
-    1. List Movies
-    ```
-2. **Купівля Квитків:**
-    ```
-    2. Buy Tickets
-    ```
-    Введіть номер фільму та кількість квитків.
-3. **Перегляд Кошика:**
-    ```
-    3. View Cart
-    ```
-4. **Оплата:**
-    ```
-    4. Pay Cart
-    ```
-    Введіть суму для оплати.
-5. **Збереження Кошика:**
-    ```
-    5. Save Cart
-    ```
-6. **Завантаження Кошика:**
-    ```
-    6. Load Cart
-    ```
+3. **View Cart:**
+   - Displays the movies in the cart along with the quantity and total price.
+   - Shows the chosen seats for each movie.
 
-## Кольоровий Інтерфейс
-Програма використовує кольори для покращення візуального сприйняття:
-- **Зелений:** Заголовки та успішні операції.
-- **Жовтий:** Опції меню.
-- **Червоний:** Помилки та попередження.
-- **Блакитний:** Список фільмів та інформація.
+4. **Pay Cart:**
+   - Users can apply discount codes during payment.
+   - Displays the total amount to be paid and handles the payment process.
+
+5. **Save Cart:**
+   - Saves the current cart to a file (`cart.txt`).
+
+6. **Load Cart:**
+   - Loads the cart from a file (`cart.txt`).
+
+## Discount Codes
+
+The program supports the following discount codes:
+
+- `SAVE10`: 10% discount
+- `SAVE20`: 20% discount
+- `SAVE30`: 30% discount
+
+**Main Menu:**
+- **1. List of Movies:** View the list of available movies.
+- **2. Buy Tickets:** Buy tickets for a movie and choose your seats.
+- **3. View Cart:** View the items in your cart.
+- **4. Pay Cart:** Apply discount codes and pay for your tickets.
+- **5. Save Cart:** Save the current cart to a file.
+- **6. Exit:** Exit the program.
+
+## Code Structure
+
+- **Movie:** A struct that holds information about a movie (name, price, time, description, duration).
+- **Ticket:** A struct that holds information about a ticket (movie, quantity, seats).
+- **Discount:** A struct that holds information about a discount code (code, discount percentage).
+
+## Functions
+
+- **displayMovies():** Displays the list of available movies.
+- **displaySeats(char seats[ROWS][SEATS_PER_ROW]):** Displays the seat arrangement for a movie.
+- **chooseSeats(char seats[ROWS][SEATS_PER_ROW], int quantity):** Allows the user to choose seats for a movie.
+- **addTicketToCart(Movie movie, int quantity):** Adds a ticket to the cart.
+- **buyTickets():** Handles the process of buying tickets.
+- **viewCart():** Displays the contents of the cart.
+- **applyDiscount(int *total):** Applies a discount code to the total amount.
+- **payCart():** Handles the payment process for the cart.
+- **saveCart():** Saves the cart to a file.
+- **loadCart():** Loads the cart from a file.
+- **menu():** Displays the main menu and handles user input.
